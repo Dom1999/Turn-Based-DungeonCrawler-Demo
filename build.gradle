@@ -11,7 +11,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.4'
-        
 
     }
 }
@@ -90,6 +89,7 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         api "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        
+        implementation 'com.google.code.gson:gson:2.8.6'
+
     }
 }

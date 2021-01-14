@@ -54,6 +54,6 @@ public abstract class Entity implements Action {
         hp -= num;
     }
     public void gainHP(int num) {
-        hp = (hp + num) % GameManager.PlayerHP;
+        hp = (hp + num) % GameManager.PLAYER_HP;
     }
 }

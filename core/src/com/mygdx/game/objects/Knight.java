@@ -7,33 +7,42 @@ import com.mygdx.game.util.Dice;
 import static com.mygdx.game.util.Dice.d20;
 
 public class Knight extends Entity {
-
-
-    private int armorLevel = 0;
-    private int hpLevel = 0;
-    private int attackLevel = 0;
-    private int attackMod = 0;
+    private int attackMod = 2;
     private int healTimer = 0;
+    private int gold = 0;
+    private int level = 1;
 
+    public void levelUp() {
+        level++;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setGold(int gold) {
+        this.gold = gold;
+    }
+
+    public int getGold() {
+        return gold;
+    }
 
     public Knight(int hp, int armor, TextureRegion sprite, String name) {
         super(hp, armor, sprite, name);
     }
 
-    public int strikeDamage() {
-        return Dice.d6(attackMod);
+    public int getAttackMod() {
+        return attackMod;
     }
 
-    public int blockAmount() {
-        return Dice.d8(armor);
+    public void setAttackMod(int attackMod) {
+        this.attackMod = attackMod;
     }
-
-    public void applyUpgrade() {
-        this.armor = this.armor + armorLevel;
-        this.hp = this.hp + hpLevel;
-        this.attackMod = this.attackMod + attackLevel;
-    }
-
 
     @Override
     public String actionName(int id) {

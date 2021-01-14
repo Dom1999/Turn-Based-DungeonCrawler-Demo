@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.MainMenu;
+import com.mygdx.game.screens.UpgradeScreen;
 import com.mygdx.game.util.GameManager;
 import com.mygdx.game.util.assets.AssetDescriptors;
 
@@ -34,6 +35,7 @@ public class GameClass extends Game {
 		assetManager.load(AssetDescriptors.FONT);
 		assetManager.load(AssetDescriptors.GAMEPLAY_ATLAS);
 		assetManager.finishLoading();
+		gameManager = new GameManager(this);
 		goToFirstScreen();
 	}
 
@@ -60,7 +62,7 @@ public class GameClass extends Game {
 				super.setScreen(new MainMenu(this));
 				break;
 			case UPGRADE:
-				//super.setScreen(new OptionsMenu(this));
+				super.setScreen(new UpgradeScreen(this));
 				break;
 			case GAME:
 				super.setScreen(new GameScreen(this));

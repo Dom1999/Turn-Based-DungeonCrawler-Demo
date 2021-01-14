@@ -61,7 +61,11 @@ public class GameScreen extends ScreenAdapter {
     private TextButton healBtn;
     private TextButton back;
 
+    private MyDialog endDialog;
+
     boolean playerTurn = false, enemyTurn = false;
+    boolean playerDead = false, enemyDead = false;
+
 
 
     public GameScreen(GameClass game) {
@@ -73,7 +77,7 @@ public class GameScreen extends ScreenAdapter {
         dungeon = atlas.findRegion(RegionNames.DUNGEONS);
         menu = atlas.findRegion(RegionNames.ACTION_MENU);
 
-        player = new Knight(GameManager.PlayerHP, GameManager.PlayerAC, atlas.findRegion(RegionNames.KNIGHT), GameManager.PlayerName);
+        player = new Knight(GameManager.PLAYER_HP, GameManager.PLAYER_AC, atlas.findRegion(RegionNames.KNIGHT), GameManager.PLAYER_NAME);
         enemy = spawnEnemy();
 
         skin = assetManager.get(AssetDescriptors.DEFAULT_SKIN);
@@ -88,10 +92,10 @@ public class GameScreen extends ScreenAdapter {
         stage = new Stage(viewport, batch);
         Gdx.input.setInputProcessor(stage);
 
-        playerHP = new Label("Hit Points: " + player.hp + "/" + GameManager.PlayerHP, new Label.LabelStyle(textFont, Color.GREEN));
+        playerHP = new Label("Hit Points: " + player.hp + "/" + GameManager.PLAYER_HP, new Label.LabelStyle(textFont, Color.GREEN));
         playerHP.setFontScale(0.7f);
 
-        enemyHP = new Label("Hit Points: " + enemy.hp + "/" + GameManager.PlayerHP, new Label.LabelStyle(textFont, Color.RED));
+        enemyHP = new Label("Hit Points: " + enemy.hp + "/" + GameManager.PLAYER_HP, new Label.LabelStyle(textFont, Color.RED));
         Pixmap labelColor = new Pixmap((int) enemyHP.getWidth() - 50, (int) enemyHP.getHeight(), Pixmap.Format.RGB888);
         labelColor.setColor(Color.BLACK);
         labelColor.fill();
@@ -145,7 +149,7 @@ public class GameScreen extends ScreenAdapter {
         table.add(healBtn).height(btnHeight).width(btnWidth).pad(1).row();
         table.add(enemyHP).pad(1).row();
         table.add(enemyAction).row();
-        table.add(back).height(btnHeight).width(btnWidth).pad(1).padTop(50).row();
+        table.add(back).height(btnHeight).width(btnWidth).pad(1).padTop(40).row();
 
 
         table.setFillParent(true);
@@ -157,6 +161,16 @@ public class GameScreen extends ScreenAdapter {
         stage.addActor(table);
     }
 
+    private void openDialog(String text) {
+        endDialog = new MyDialog(text, skin, "dialog") {
+        };
+        endDialog.setSize(400, 300);
+        endDialog.addButton("Ok", MyDialog.DialogSelected.yes, skin.get("default", TextButton.TextButtonStyle.class)).fillX().height(30).expand().left();
+
+        endDialog.getContentTable().clearChildren();
+        endDialog.show(stage);
+    }
+
     @Override
     public void render(float delta) {
         batch.setProjectionMatrix(viewport.getCamera().combined);
@@ -166,7 +180,8 @@ public class GameScreen extends ScreenAdapter {
         stage.act(delta);
         stage.draw();
 
-        combat();
+        if (!playerDead && !enemyDead)
+            combat();
     }
 
     private int enemyActionID = 0, playerActionID = 0;
@@ -184,7 +199,13 @@ public class GameScreen extends ScreenAdapter {
             player.takeAction(enemy, playerActionID);
 
             if (enemy.hp <= 0) {
-                game.gotoScreen(GameClass.Screens.MAIN_MENU);
+                int reward = Dice.d4()*50;
+                openDialog(enemy.name + " slain, looted " + reward + " Gold");
+                GameManager.PLAYER_GOLD = GameManager.PLAYER_GOLD + reward;
+                Gdx.app.log("FIGHT ENDED", "GOLD AMOUNT " + GameManager.PLAYER_GOLD);
+                GameManager.saveSettings();
+
+                enemyDead = true;
                 Gdx.app.log("FIGHT ENDED", "you win");
             }
 
@@ -192,7 +213,8 @@ public class GameScreen extends ScreenAdapter {
             enemy.takeAction(player, enemyActionID);//enemyActionID
 
             if (player.hp <= 0) {
-                game.gotoScreen(GameClass.Screens.MAIN_MENU);
+                openDialog("YOU DIED");
+                playerDead = true;
                 Gdx.app.log("FIGHT ENDED", "you died");
             }
 
@@ -205,14 +227,17 @@ public class GameScreen extends ScreenAdapter {
 
     private void updateGameState() {
         GdxUtils.clearScreen();
-        playerHP.setText("Hit Points: " + player.hp + "/" + GameManager.PlayerHP);
+        playerHP.setText("Hit Points: " + player.hp + "/" + GameManager.PLAYER_HP);
         enemyHP.setText("Hit Points: " + enemy.hp + "/" + maxEnemyHP);
         enemyAction.setText(enemy.actionName(enemyActionID));
 
 
         batch.draw(dungeon, -20,0,viewport.getWorldWidth()-100, viewport.getWorldHeight());
-        batch.draw(player.sprite, Constants.PLAYER_POSITION_X,Constants.PLAYER_POSITION_Y,
-                Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+        if (!playerDead)
+            batch.draw(player.sprite, Constants.PLAYER_POSITION_X,Constants.PLAYER_POSITION_Y,
+                    Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+
+        if (!enemyDead)
         batch.draw(enemy.sprite, Constants.ENEMY_POSITION_X,Constants.ENEMY_POSITION_Y,
                 Constants.ENEMY_WIDTH, Constants.ENEMY_HEIGHT);
         batch.draw(menu, viewport.getWorldWidth() - 165,0, 165, viewport.getWorldHeight());
@@ -225,8 +250,8 @@ public class GameScreen extends ScreenAdapter {
 
     public Entity spawnEnemy() {
         if (Dice.d6() > 0) {
-            maxEnemyHP = Dice.d12(7);
-            return new Skeleton(maxEnemyHP, 12, atlas.findRegion(RegionNames.SKELETON), "Skeleton boyo");
+            maxEnemyHP = Dice.d12(3);
+            return new Skeleton(maxEnemyHP, 12, atlas.findRegion(RegionNames.SKELETON), "Skeleton");
         }
         else return new Skeleton(5,5, atlas.findRegion(RegionNames.SKELETON), "Skeleton boyo");
     }
