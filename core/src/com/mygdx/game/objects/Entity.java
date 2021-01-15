@@ -6,6 +6,7 @@ import com.mygdx.game.util.GameManager;
 
 public abstract class Entity implements Action {
     public int hp;
+    public int maxHP;
     public int armor;
     public TextureRegion sprite;
     public String name;
@@ -13,6 +14,7 @@ public abstract class Entity implements Action {
 
     public Entity(int hp, int armor, TextureRegion sprite, String name) {
         this.hp = hp;
+        maxHP = hp;
         this.armor = armor;
         this.sprite = sprite;
         this.name = name;
@@ -54,6 +56,6 @@ public abstract class Entity implements Action {
         hp -= num;
     }
     public void gainHP(int num) {
-        hp = (hp + num) % GameManager.PLAYER_HP;
+        hp = (hp + num) % maxHP;
     }
 }

@@ -22,14 +22,12 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.game.GameClass;
 import com.mygdx.game.GdxUtils;
 import com.mygdx.game.util.Constants;
+import com.mygdx.game.util.Dice;
 import com.mygdx.game.util.GameManager;
 import com.mygdx.game.util.assets.AssetDescriptors;
 import com.mygdx.game.util.assets.RegionNames;
 
-import static com.mygdx.game.util.GameManager.ATTACK_MOD;
 import static com.mygdx.game.util.GameManager.PLAYER;
-import static com.mygdx.game.util.GameManager.PLAYER_GOLD;
-import static com.mygdx.game.util.GameManager.PLAYER_LEVEL;
 import static com.mygdx.game.util.GameManager.UPGRADE_COST;
 
 public class UpgradeScreen extends ScreenAdapter {
@@ -86,11 +84,11 @@ public class UpgradeScreen extends ScreenAdapter {
         stage = new Stage(viewport, batch);
         Gdx.input.setInputProcessor(stage);
 
-        currentGoldLabel = new Label("" + GameManager.PLAYER_GOLD + " Gold",  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.GOLD));
-        currentHPLabel = new Label("" + GameManager.PLAYER_HP + " Max HP",  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.WHITE));
-        currentACLabel = new Label("" + GameManager.PLAYER_AC + " Armor",  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.WHITE));
-        currentATKLabel = new Label(GameManager.ATTACK_MOD + " bonus",  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.WHITE));
-        currentLevelLabel = new Label("" + GameManager.PLAYER_LEVEL,  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.GOLD));
+        currentGoldLabel = new Label("" + PLAYER.getGold() + " Gold",  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.GOLD));
+        currentHPLabel = new Label("" + PLAYER.hp + " Max HP",  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.WHITE));
+        currentACLabel = new Label("" + PLAYER.armor + " Armor",  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.WHITE));
+        currentATKLabel = new Label(PLAYER.getAttackMod() + " bonus",  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.WHITE));
+        currentLevelLabel = new Label("" + PLAYER.getLevel(),  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.GOLD));
         costLable = new Label("" + GameManager.UPGRADE_COST,  new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.WHITE));
 
         float fontScale = 0.4f;
@@ -104,12 +102,12 @@ public class UpgradeScreen extends ScreenAdapter {
 
         Table enterText = new Table();
         nameLabel = new Label("Name: ", new Label.LabelStyle(assetManager.get(AssetDescriptors.FONT), Color.WHITE));
-        nameTextField = new TextField(GameManager.PLAYER_NAME, skin);
-        Gdx.app.log("OPTIONS MENU", GameManager.PLAYER_NAME);
+        nameTextField = new TextField(PLAYER.name, skin);
+        Gdx.app.log("OPTIONS MENU", PLAYER.name);
         nameTextField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                GameManager.PLAYER_NAME = nameTextField.getText();
+                PLAYER.name = nameTextField.getText();
             }
         });
         enterText.add(nameLabel).pad(5);
@@ -127,8 +125,8 @@ public class UpgradeScreen extends ScreenAdapter {
                     PLAYER.setGold(PLAYER.getGold() - UPGRADE_COST);
                     PLAYER.levelUp();
                     PLAYER.setAttackMod(PLAYER.getAttackMod() + 1);
-                    UPGRADE_COST += 50 * PLAYER.getLevel();
-                    GameManager.saveSettings();
+                    GameManager.updateUpgradeCost();
+                    //GameManager.saveSettings();
                 }
             }
         });
@@ -145,6 +143,13 @@ public class UpgradeScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                if (checkPrice(PLAYER.getGold())) {
+                    PLAYER.setGold(PLAYER.getGold() - UPGRADE_COST);
+                    PLAYER.levelUp();
+                    PLAYER.armor += 1;
+                    GameManager.updateUpgradeCost();
+                    //GameManager.saveSettings();
+                }
 
             }
         });
@@ -158,6 +163,15 @@ public class UpgradeScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                if (checkPrice(PLAYER.getGold())) {
+                    PLAYER.setGold(PLAYER.getGold() - UPGRADE_COST);
+                    PLAYER.levelUp();
+                    int hpRoll= Dice.d4(2);
+                    PLAYER.hp += hpRoll;
+                    PLAYER.maxHP += hpRoll;
+                    GameManager.updateUpgradeCost();
+                    //GameManager.saveSettings();
+                }
 
             }
         });
@@ -227,7 +241,7 @@ public class UpgradeScreen extends ScreenAdapter {
     }
 
     private void applyUpgrades() {
-        GameManager.PLAYER_NAME = nameTextField.getText();
+        PLAYER.name = nameTextField.getText();
     }
 
     @Override
@@ -251,6 +265,7 @@ public class UpgradeScreen extends ScreenAdapter {
         currentATKLabel.setText("+" + PLAYER.getAttackMod() + " to attack rolls");
         currentLevelLabel.setText(" level " + PLAYER.getLevel());
         nameTextField.setText(PLAYER.name);
+        GameManager.updateUpgradeCost();
         costLable.setText("Cost: " + GameManager.UPGRADE_COST);
 
     }

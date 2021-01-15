@@ -12,16 +12,6 @@ import com.mygdx.game.util.assets.RegionNames;
 
 
 public class GameManager {
-
-
-
-    public static String PLAYER_NAME = "Player 1";
-    public static int PLAYER_LEVEL = 1;
-    public static int PLAYER_HP = 15;
-    public static int PLAYER_AC = 10;
-    public static int PLAYER_GOLD = 0;
-    public static int ATTACK_MOD = 2;
-
     public static int UPGRADE_COST = 100;
 
     public static Knight PLAYER;
@@ -44,7 +34,8 @@ public class GameManager {
         }
 
 
-        updatePlayer();
+        //updatePlayer();
+        updateUpgradeCost();
         jsonKnight = new KnightJSON(PLAYER);
 
 
@@ -66,12 +57,13 @@ public class GameManager {
             PLAYER = new Knight(jsonKnight.hp, jsonKnight.armor, assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT), jsonKnight.name);
             PLAYER.setGold(jsonKnight.gold);
             PLAYER.setAttackMod(jsonKnight.attackMod);
-
-            updateCharacter();
+            PLAYER.setLevel(jsonKnight.level);
+            updateUpgradeCost();
+            //updateCharacter();
         }
 
     }
-
+/*
     private static void updateCharacter() {
         PLAYER_NAME = PLAYER.name;
         PLAYER_HP = PLAYER.hp;
@@ -89,15 +81,18 @@ public class GameManager {
         PLAYER.setAttackMod(ATTACK_MOD);
         PLAYER.setLevel(PLAYER_LEVEL);
     }
-
+*/
     public static void createNewCharacter() {
         PLAYER = new Knight(15, 10, assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT), "Dave");
         PLAYER.setGold(200);
-        updateCharacter();
-        updatePlayer();
+        //updateCharacter();
+        //updatePlayer();
         saveSettings();
     }
 
+    public static void updateUpgradeCost() {
+        UPGRADE_COST = PLAYER.getLevel() * 100;
+    }
 }
 
  class KnightJSON {
