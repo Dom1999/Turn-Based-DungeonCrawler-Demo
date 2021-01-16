@@ -32,6 +32,7 @@ public class AssetDescriptors {
 
     public static final AssetDescriptor<Sound> DRINK_SOUND =
             new AssetDescriptor<Sound>(AssetPaths.DRINK_SOUND, Sound.class);
+
     public static final AssetDescriptor<Sound> BLOCKED_SOUND =
             new AssetDescriptor<Sound>(AssetPaths.BLOCKED_SOUND, Sound.class);
 
