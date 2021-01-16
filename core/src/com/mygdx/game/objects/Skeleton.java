@@ -1,27 +1,60 @@
 package com.mygdx.game.objects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.mygdx.game.GameClass;
+import com.mygdx.game.screens.GameScreen;
+import com.mygdx.game.util.Constants;
 import com.mygdx.game.util.Dice;
+import com.mygdx.game.util.assets.AssetDescriptors;
 
 import static com.mygdx.game.util.Dice.d20;
 
 public class Skeleton extends Entity {
 
-
+    private Sound missSFX;
+    private Sound maceSFX;
+    private Sound swordSFX;
+    private Sound blockedSFX;
 
 
     public Skeleton(int hp, int armor, TextureRegion sprite, String name) {
         super(hp, armor, sprite, name);
         dodging = true;
+        missSFX = GameClass.assetManager.get(AssetDescriptors.MISS_SOUND);
+        maceSFX = GameClass.assetManager.get(AssetDescriptors.MACE_SOUND);
+        swordSFX = GameClass.assetManager.get(AssetDescriptors.SWORD_SOUND);
+        blockedSFX = GameClass.assetManager.get(AssetDescriptors.BLOCKED_SOUND);
     }
 
-    public int swordStrike() {
-        return Dice.d8();
+    @Override
+    public void draw(SpriteBatch batch, Animation animation, float deltaTime) {
+        playAnimation(batch, animation, deltaTime, Constants.ENEMY_POSITION_X,Constants.ENEMY_POSITION_Y,
+                Constants.ENEMY_WIDTH, Constants.ENEMY_HEIGHT);
     }
 
-    public int maceStrike() {
-        return Dice.d4(2);
+    private float timePassed = 0;
+    private boolean animationReset = true;
+    @Override
+    public void playAnimation(SpriteBatch batch, Animation animation, float deltaTime, float x, float y, float width, float height) {
+        timePassed += deltaTime;
+        if (animation.getKeyFrames().length > 1)
+            GameScreen.animationsPlaying = true;
+
+        batch.draw((TextureRegion) animation.getKeyFrame(timePassed, true), x, y, width, height);
+
+        //Gdx.app.log("ANIMATION", "" + animation.isAnimationFinished(timePassed) + " " + timePassed + " " + animation.getKeyFrames().length);
+
+        if (animation.isAnimationFinished(timePassed)) {
+            //GameScreen.animationID = 0;
+            GameScreen.enemyAnimationID = 0;
+            timePassed = 0;
+        }
+
     }
 
     @Override
@@ -36,7 +69,7 @@ public class Skeleton extends Entity {
 
     @Override
     public String action3Name() {
-        return "Dodge";
+        return "Nothing";
     }
 
     @Override
@@ -51,11 +84,17 @@ public class Skeleton extends Entity {
         Gdx.app.log(this.name + " action", "rolls: " + roll1 + " " + roll2 + " roll taken: " + roll);
 
         if(roll >= target.armor){
+            swordSFX.play();
             int dmg = Dice.d8(2);
             Gdx.app.log(this.name + " action", "HIT dmg taken " + dmg);
             target.loseHP(dmg);
         }
         else {
+            if (target.dodging)
+                blockedSFX.play();
+            else
+                missSFX.play();
+
             Gdx.app.log(this.name + " action", "MISS");
         }
     }
@@ -66,10 +105,10 @@ public class Skeleton extends Entity {
         int roll = d20(2);
 
         if (target.dodging){
-            roll+=15;
             int dmg = Dice.d12();
             target.loseHP(dmg);
             Gdx.app.log(this.name + " action", "rolled " + dmg);
+            maceSFX.play();
         }
 
         else
@@ -78,8 +117,10 @@ public class Skeleton extends Entity {
                 int dmg = Dice.d4();
                 Gdx.app.log(this.name + " action", "HIT dmg taken " + dmg);
                 target.loseHP(dmg);
+                maceSFX.play();
             }
             else {
+                missSFX.play();
                 Gdx.app.log(this.name + " action", "MISS");
             }
         }

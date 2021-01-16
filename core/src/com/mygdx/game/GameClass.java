@@ -17,7 +17,7 @@ public class GameClass extends Game {
 	Texture img;
 	GameManager gameManager;
 
-	private AssetManager assetManager = new AssetManager();
+	public static AssetManager assetManager = new AssetManager();
 
 	public static enum Screens {
 		MAIN_MENU, GAME, UPGRADE;
@@ -34,6 +34,11 @@ public class GameClass extends Game {
 		assetManager.load(AssetDescriptors.TITLE_FONT);
 		assetManager.load(AssetDescriptors.FONT);
 		assetManager.load(AssetDescriptors.GAMEPLAY_ATLAS);
+		assetManager.load(AssetDescriptors.SWORD_SOUND);
+		assetManager.load(AssetDescriptors.MACE_SOUND);
+		assetManager.load(AssetDescriptors.MISS_SOUND);
+		assetManager.load(AssetDescriptors.DRINK_SOUND);
+		assetManager.load(AssetDescriptors.BLOCKED_SOUND);
 		assetManager.finishLoading();
 		gameManager = new GameManager(this);
 		goToFirstScreen();
@@ -48,7 +53,7 @@ public class GameClass extends Game {
 	public void dispose () {
 		batch.dispose();
 		assetManager.dispose();
-		img.dispose();
+
 	}
 
 	private void goToFirstScreen() {

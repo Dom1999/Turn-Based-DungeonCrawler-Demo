@@ -17,6 +17,45 @@ size: 1024, 1024
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
+knight_attack
+  rotate: false
+  xy: 2, 2
+  size: 821, 800
+  orig: 821, 800
+  offset: 0, 0
+  index: -1
+
+gameplay3.png
+size: 1024, 1024
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+player_heal
+  rotate: false
+  xy: 2, 2
+  size: 800, 801
+  orig: 800, 801
+  offset: 0, 0
+  index: -1
+
+gameplay4.png
+size: 1024, 1024
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+player_heal2
+  rotate: false
+  xy: 2, 2
+  size: 800, 801
+  orig: 800, 801
+  offset: 0, 0
+  index: -1
+
+gameplay5.png
+size: 1024, 1024
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
 knight
   rotate: false
   xy: 2, 2
@@ -25,7 +64,20 @@ knight
   offset: 0, 0
   index: -1
 
-gameplay3.png
+gameplay6.png
+size: 1024, 1024
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+player_shield
+  rotate: false
+  xy: 2, 2
+  size: 800, 800
+  orig: 800, 800
+  offset: 0, 0
+  index: -1
+
+gameplay7.png
 size: 1024, 1024
 format: RGBA8888
 filter: Nearest, Nearest
@@ -38,18 +90,37 @@ skeleton
   offset: 0, 0
   index: -1
 
-gameplay4.png
+gameplay8.png
 size: 1024, 1024
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-knight_attack
+skeleton_mace
   rotate: false
-  xy: 304, 265
-  size: 531, 537
-  orig: 531, 537
+  xy: 2, 2
+  size: 800, 800
+  orig: 800, 800
   offset: 0, 0
   index: -1
+
+gameplay9.png
+size: 1024, 1024
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+skeleton_sword
+  rotate: false
+  xy: 2, 2
+  size: 800, 800
+  orig: 800, 800
+  offset: 0, 0
+  index: -1
+
+gameplay10.png
+size: 512, 1024
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
 menu
   rotate: false
   xy: 2, 2

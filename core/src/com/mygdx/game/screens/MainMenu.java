@@ -74,7 +74,9 @@ public class MainMenu extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+                GameManager.loadSettings();
                 game.gotoScreen(GameClass.Screens.GAME);
+
             }
         });
         upgradeButton = new TextButton("Upgrade", skin);

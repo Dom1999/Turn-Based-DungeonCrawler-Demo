@@ -1,8 +1,11 @@
 package com.mygdx.game.util;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.util.assets.AssetDescriptors;
+import com.mygdx.game.util.assets.RegionNames;
 
 public class Constants {
     public static final String GAME_TITLE = "Dungeon Crawler";
@@ -21,4 +24,6 @@ public class Constants {
     public static final int ENEMY_WIDTH = 250;
     public static final int ENEMY_POSITION_X = 320;
     public static final int ENEMY_POSITION_Y = 40;
+
+
 }

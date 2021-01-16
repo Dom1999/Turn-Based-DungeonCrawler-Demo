@@ -1,7 +1,12 @@
 package com.mygdx.game.objects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+import com.mygdx.game.screens.GameScreen;
+import com.mygdx.game.util.Constants;
 import com.mygdx.game.util.GameManager;
 
 public abstract class Entity implements Action {
@@ -13,8 +18,8 @@ public abstract class Entity implements Action {
     public boolean dodging = false;
 
     public Entity(int hp, int armor, TextureRegion sprite, String name) {
-        this.hp = hp;
-        maxHP = hp;
+        this.maxHP = hp;
+        this.hp = maxHP;
         this.armor = armor;
         this.sprite = sprite;
         this.name = name;
@@ -58,4 +63,27 @@ public abstract class Entity implements Action {
     public void gainHP(int num) {
         hp = (hp + num) % maxHP;
     }
+
+    public void draw(SpriteBatch batch, Animation animation, float deltaTime){
+    }
+
+    private float timePassed = 0;
+    private boolean animationReset = true;
+    public void playAnimation(SpriteBatch batch, Animation animation, float deltaTime, float x, float y, float width, float height) {
+        timePassed += deltaTime;
+        if (animation.getKeyFrames().length > 1)
+            GameScreen.animationsPlaying = true;
+
+        batch.draw((TextureRegion) animation.getKeyFrame(timePassed, true), x, y, width, height);
+
+        //Gdx.app.log("ANIMATION", "" + animation.isAnimationFinished(timePassed) + " " + timePassed + " " + animation.getKeyFrames().length);
+
+        if (animation.isAnimationFinished(timePassed)) {
+            GameScreen.animationID = 0;
+            GameScreen.enemyAnimationID = 0;
+            timePassed = 0;
+        }
+
+    }
+
 }

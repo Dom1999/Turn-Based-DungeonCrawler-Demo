@@ -19,6 +19,8 @@ public class GameManager {
 
     private static Gson gson;
 
+
+
     public GameManager(GameClass game) {
         assetManager = game.getAssetManager();
     }
@@ -63,25 +65,7 @@ public class GameManager {
         }
 
     }
-/*
-    private static void updateCharacter() {
-        PLAYER_NAME = PLAYER.name;
-        PLAYER_HP = PLAYER.hp;
-        PLAYER_AC = PLAYER.armor;
-        PLAYER_GOLD = PLAYER.getGold();
-        ATTACK_MOD = PLAYER.getAttackMod();
-        PLAYER_LEVEL = PLAYER.getLevel();
-    }
 
-    private static void updatePlayer() {
-        PLAYER.name = PLAYER_NAME;
-        PLAYER.hp = PLAYER_HP;
-        PLAYER.armor = PLAYER_AC;
-        PLAYER.setGold(PLAYER_GOLD);
-        PLAYER.setAttackMod(ATTACK_MOD);
-        PLAYER.setLevel(PLAYER_LEVEL);
-    }
-*/
     public static void createNewCharacter() {
         PLAYER = new Knight(15, 10, assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT), "Dave");
         PLAYER.setGold(200);

@@ -11,4 +11,6 @@ public interface Action {
     void action3(Entity player);
 
     void takeAction(Entity player, int actionID);
+
+
 }

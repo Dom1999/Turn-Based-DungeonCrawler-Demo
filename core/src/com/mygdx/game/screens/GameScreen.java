@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.GameClass;
@@ -32,6 +34,8 @@ import com.mygdx.game.util.Dice;
 import com.mygdx.game.util.GameManager;
 import com.mygdx.game.util.assets.AssetDescriptors;
 import com.mygdx.game.util.assets.RegionNames;
+
+import static com.mygdx.game.util.GameManager.PLAYER;
 
 public class GameScreen extends ScreenAdapter {
 
@@ -62,10 +66,13 @@ public class GameScreen extends ScreenAdapter {
     private TextButton back;
 
     private MyDialog endDialog;
+    private Array<Animation> playerAnimations;
+    private Array<Animation> enemyAnimations;
 
     boolean playerTurn = false, enemyTurn = false;
     boolean playerDead = false, enemyDead = false;
-
+    public static int animationID = 0, enemyAnimationID = 0;
+    public static boolean animationsPlaying = false;
 
 
     public GameScreen(GameClass game) {
@@ -77,10 +84,10 @@ public class GameScreen extends ScreenAdapter {
         dungeon = atlas.findRegion(RegionNames.DUNGEONS);
         menu = atlas.findRegion(RegionNames.ACTION_MENU);
 
-        if (GameManager.PLAYER == null) {
+        if (PLAYER == null) {
             GameManager.loadSettings();
         }
-        player = GameManager.PLAYER;
+        player = PLAYER;
         enemy = spawnEnemy();
 
         skin = assetManager.get(AssetDescriptors.DEFAULT_SKIN);
@@ -89,13 +96,72 @@ public class GameScreen extends ScreenAdapter {
         textFont = assetManager.get(AssetDescriptors.FONT);
 
         initHUD();
+        initAnimations();
+
+        Gdx.app.log("ENEMY ANIMATIONS", "" + enemyAnimations.size);
+
+    }
+
+    private void initAnimations() {
+        playerAnimations = new Array<>();
+        enemyAnimations = new Array<>();
+
+        //player Animations
+        Animation playerAttack, playerIdle, playerBlock, playerHeal;
+        Array<TextureRegion> attackFrames = new Array<>();
+        attackFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT));
+        attackFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT_ATTACK));
+        playerAttack = new Animation(0.5f, attackFrames);
+
+        Array<TextureRegion> idleFrames = new Array<>();
+        idleFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT));
+        playerIdle = new Animation(1f, idleFrames);
+
+        Array<TextureRegion> blockFrames = new Array<>();
+        blockFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT));
+        blockFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT_DEFENCE));
+        playerBlock = new Animation(0.5f, blockFrames);
+
+        Array<TextureRegion> healFrames = new Array<>();
+        healFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT));
+        healFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT_HEAL));
+        healFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT_HEAL2));
+        healFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT_HEAL));
+        healFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT_HEAL2));
+        playerHeal = new Animation(0.3f, healFrames);
+
+        playerAnimations.add(playerIdle);
+        playerAnimations.add(playerAttack);
+        playerAnimations.add(playerBlock);
+        playerAnimations.add(playerHeal);
+
+        Animation enemyIdle, enemyMace, enemySword;
+        Array<TextureRegion> idleEnemyFrames = new Array<>();
+        idleEnemyFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.SKELETON));
+        enemyIdle = new Animation(1f, idleEnemyFrames);
+
+
+        Array<TextureRegion> enemySwordFrames = new Array<>();
+        enemySwordFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.SKELETON));
+        enemySwordFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.SKELETON_SWORD));
+        enemySword = new Animation(0.5f, enemySwordFrames);
+
+        Array<TextureRegion> enemyMaceFrames = new Array<>();
+        enemyMaceFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.SKELETON));
+        enemyMaceFrames.add(assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.SKELETON_MACE));
+        enemyMace = new Animation(0.5f, enemyMaceFrames);
+
+        enemyAnimations.add(enemyIdle);
+        enemyAnimations.add(enemySword);
+        enemyAnimations.add(enemyMace);
+        enemyAnimations.add(enemyIdle);
     }
 
     private void initHUD() {
         stage = new Stage(viewport, batch);
         Gdx.input.setInputProcessor(stage);
 
-        playerHP = new Label("Hit Points: " + player.hp + "/" + GameManager.PLAYER.maxHP, new Label.LabelStyle(textFont, Color.GREEN));
+        playerHP = new Label("Hit Points: " + player.hp + "/" + PLAYER.maxHP, new Label.LabelStyle(textFont, Color.GREEN));
         playerHP.setFontScale(0.7f);
 
         enemyHP = new Label("Hit Points: " + enemy.hp + "/" + enemy.maxHP, new Label.LabelStyle(textFont, Color.RED));
@@ -183,7 +249,7 @@ public class GameScreen extends ScreenAdapter {
         stage.act(delta);
         stage.draw();
 
-        if (!playerDead && !enemyDead)
+        if (!playerDead && !enemyDead && animationID == 0)
             combat();
     }
 
@@ -201,28 +267,34 @@ public class GameScreen extends ScreenAdapter {
         if (playerTurn && enemyTurn){
             player.takeAction(enemy, playerActionID);
 
-            if (enemy.hp <= 0) {
+            if (enemy.hp <= 0 && animationID == 0) {
                 int reward = Dice.d4()*50;
                 openDialog(enemy.name + " slain, looted " + reward + " Gold");
-                GameManager.PLAYER.setGold(GameManager.PLAYER.getGold() + reward);
-                Gdx.app.log("FIGHT ENDED", "GOLD AMOUNT " + GameManager.PLAYER.getGold());
+                PLAYER.setGold(PLAYER.getGold() + reward);
+                Gdx.app.log("FIGHT ENDED", "GOLD AMOUNT " + PLAYER.getGold());
+                PLAYER.hp = PLAYER.maxHP;
                 GameManager.saveSettings();
 
                 enemyDead = true;
                 Gdx.app.log("FIGHT ENDED", "you win");
+                animationID = enemyAnimationID = 0;
             }
 
 
-            enemy.takeAction(player, enemyActionID);//enemyActionID
+            enemy.takeAction(player, enemyActionID);
 
             if (player.hp <= 0) {
                 openDialog("YOU DIED");
                 playerDead = true;
                 Gdx.app.log("FIGHT ENDED", "you died");
+                animationID = enemyAnimationID = 0;
             }
 
             Gdx.app.log("TURN ENDED", "actions taken");
             playerTurn = enemyTurn = false;
+            animationID = playerActionID;
+            enemyAnimationID = enemyActionID;
+
         }
 
 
@@ -230,23 +302,32 @@ public class GameScreen extends ScreenAdapter {
 
     private void updateGameState() {
         GdxUtils.clearScreen();
-        playerHP.setText("Hit Points: " + player.hp + "/" + GameManager.PLAYER.maxHP);
+        playerHP.setText("Hit Points: " + player.hp + "/" + PLAYER.maxHP);
         enemyHP.setText("Hit Points: " + enemy.hp + "/" + maxEnemyHP);
         enemyAction.setText(enemy.actionName(enemyActionID));
 
 
         batch.draw(dungeon, -20,0,viewport.getWorldWidth()-100, viewport.getWorldHeight());
 
+        Animation currAnimation = playerAnimations.get(animationID);
         if (!playerDead) {
-            batch.draw(player.sprite, Constants.PLAYER_POSITION_X,Constants.PLAYER_POSITION_Y,
-                    Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+            player.draw(batch, currAnimation, Gdx.graphics.getDeltaTime());
+
+            if(currAnimation.isAnimationFinished(Gdx.graphics.getDeltaTime())){
+                animationID = 0;
+            }
         }
+        Animation currEnemyAnimation = enemyAnimations.get(enemyAnimationID);
         if (!enemyDead) {
-            batch.draw(enemy.sprite, Constants.ENEMY_POSITION_X,Constants.ENEMY_POSITION_Y,
-                    Constants.ENEMY_WIDTH, Constants.ENEMY_HEIGHT);
+            enemy.draw(batch, currEnemyAnimation, Gdx.graphics.getDeltaTime());
+
+            if(currEnemyAnimation.isAnimationFinished(Gdx.graphics.getDeltaTime())){
+                enemyAnimationID = 0;
+            }
         }
 
         batch.draw(menu, viewport.getWorldWidth() - 165,0, 165, viewport.getWorldHeight());
+        while (currAnimation.isAnimationFinished(Gdx.graphics.getDeltaTime()) && currEnemyAnimation.isAnimationFinished(Gdx.graphics.getDeltaTime())) {}
     }
 
     @Override
