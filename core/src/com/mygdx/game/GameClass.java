@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.MainMenu;
 import com.mygdx.game.screens.UpgradeScreen;
+import com.mygdx.game.util.net.ConnectionManager;
 import com.mygdx.game.util.GameManager;
 import com.mygdx.game.util.assets.AssetDescriptors;
 
@@ -18,6 +19,7 @@ public class GameClass extends Game {
 	GameManager gameManager;
 
 	public static AssetManager assetManager = new AssetManager();
+	private ConnectionManager connectionManager;
 
 	public static enum Screens {
 		MAIN_MENU, GAME, UPGRADE;
@@ -25,6 +27,8 @@ public class GameClass extends Game {
 	@Override
 	public void create () {
 		Gdx.app.setLogLevel(Logger.DEBUG);
+
+
 		batch = new SpriteBatch();
 
 		assetManager = new AssetManager();
@@ -42,6 +46,7 @@ public class GameClass extends Game {
 		assetManager.finishLoading();
 		gameManager = new GameManager(this);
 		goToFirstScreen();
+
 	}
 
 	@Override
@@ -85,5 +90,13 @@ public class GameClass extends Game {
 
 	public AssetManager getAssetManager() {
 		return assetManager;
+	}
+
+	public ConnectionManager getConnectionManager() {
+		return connectionManager;
+	}
+
+	public void setConnectionManager(ConnectionManager connectionManager) {
+		this.connectionManager = connectionManager;
 	}
 }

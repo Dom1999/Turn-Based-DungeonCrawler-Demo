@@ -27,6 +27,7 @@ import com.mygdx.game.util.GameManager;
 import com.mygdx.game.util.assets.AssetDescriptors;
 import com.mygdx.game.util.assets.RegionNames;
 
+import static com.mygdx.game.util.Constants.reqLOAD;
 import static com.mygdx.game.util.GameManager.PLAYER;
 import static com.mygdx.game.util.GameManager.UPGRADE_COST;
 
@@ -187,6 +188,7 @@ public class UpgradeScreen extends ScreenAdapter {
                 super.clicked(event, x, y);
                 GameManager.createNewCharacter();
                 Gdx.app.log("UPGRADE SCREEN", "character reset");
+                //GameManager.connectionManager.sendMessage(reqLOAD, "LOAD");
             }
         });
 

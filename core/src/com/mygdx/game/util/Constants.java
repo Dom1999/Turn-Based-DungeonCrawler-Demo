@@ -25,5 +25,9 @@ public class Constants {
     public static final int ENEMY_POSITION_X = 320;
     public static final int ENEMY_POSITION_Y = 40;
 
+    public static final String reqSAVE = "_save";
+    public static final String reqLOAD = "_load";
+    public static final String reqCONNECTION = "_connect";
+
 
 }

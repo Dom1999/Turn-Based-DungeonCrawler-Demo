@@ -3,12 +3,16 @@ package com.mygdx.game.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.google.gson.Gson;
 import com.mygdx.game.GameClass;
 import com.mygdx.game.objects.Knight;
 import com.mygdx.game.util.assets.AssetDescriptors;
 import com.mygdx.game.util.assets.RegionNames;
+import com.mygdx.game.util.net.ConnectionManager;
+import com.mygdx.game.util.net.MyServerThread;
+
+
+import static com.mygdx.game.util.Constants.*;
 
 
 public class GameManager {
@@ -16,6 +20,8 @@ public class GameManager {
 
     public static Knight PLAYER;
     public static AssetManager assetManager;
+    public static ConnectionManager connectionManager = null;
+    public static boolean connected = false;
 
     private static Gson gson;
 
@@ -23,6 +29,15 @@ public class GameManager {
 
     public GameManager(GameClass game) {
         assetManager = game.getAssetManager();
+        connectionManager = game.getConnectionManager();
+        if (connectionManager != null) {
+            connectionManager.sendMessage(reqCONNECTION, "192.168.1.15");
+            connected = true;
+            Thread serverConnection = new Thread(new MyServerThread());
+            serverConnection.start();
+        }
+
+
     }
 
     public static void saveSettings() {
@@ -40,10 +55,16 @@ public class GameManager {
         updateUpgradeCost();
         jsonKnight = new KnightJSON(PLAYER);
 
+        String jsonObject = gson.toJson(jsonKnight);
+        file.writeString(jsonObject, false);
 
-        file.writeString(gson.toJson(jsonKnight), false);
+
 
         Gdx.app.log("SAVE SETTINGS", file.readString() + " SAVED");
+
+        if (connected) {
+            connectionManager.sendMessage(reqSAVE, jsonObject);
+        }
     }
 
     public static void loadSettings() {
@@ -61,7 +82,25 @@ public class GameManager {
             PLAYER.setAttackMod(jsonKnight.attackMod);
             PLAYER.setLevel(jsonKnight.level);
             updateUpgradeCost();
-            //updateCharacter();
+        }
+
+    }
+
+    public static void loadSettings(String json) {
+        gson = new Gson();
+        FileHandle file = Gdx.files.local("settings.json");
+        if (!file.exists()) {
+            createNewCharacter();
+        } else {
+
+            KnightJSON jsonKnight = gson.fromJson(json, KnightJSON.class);
+            Gdx.app.log("READ FILE", json);
+
+            PLAYER = new Knight(jsonKnight.hp, jsonKnight.armor, assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT), jsonKnight.name);
+            PLAYER.setGold(jsonKnight.gold);
+            PLAYER.setAttackMod(jsonKnight.attackMod);
+            PLAYER.setLevel(jsonKnight.level);
+            updateUpgradeCost();
         }
 
     }
@@ -69,23 +108,22 @@ public class GameManager {
     public static void createNewCharacter() {
         PLAYER = new Knight(15, 10, assetManager.get(AssetDescriptors.GAMEPLAY_ATLAS).findRegion(RegionNames.KNIGHT), "Dave");
         PLAYER.setGold(200);
-        //updateCharacter();
-        //updatePlayer();
         saveSettings();
     }
 
     public static void updateUpgradeCost() {
         UPGRADE_COST = PLAYER.getLevel() * 100;
     }
+
 }
 
  class KnightJSON {
      public int hp;
      public int armor;
      public String name;
-     public int attackMod = 2;
-     public int gold = 0;
-     public int level = 1;
+     public int attackMod;
+     public int gold;
+     public int level;
 
      public KnightJSON(Knight knight) {
          this.hp = knight.hp;
