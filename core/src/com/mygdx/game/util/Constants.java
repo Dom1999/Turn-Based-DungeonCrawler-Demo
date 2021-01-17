@@ -12,8 +12,8 @@ public class Constants {
 
     public static final int SCREEN_WIDTH = 1500;
     public static final int SCREEN_HEIGHT = 700;
-    public static final int WORLD_HEIGHT = 350;
-    public static final int WORLD_WIDTH = 725;
+    public static final int WORLD_HEIGHT = 365;
+    public static final int WORLD_WIDTH = 740;
 
     public static final int PLAYER_HEIGHT = 350;
     public static final int PLAYER_WIDTH = 350;

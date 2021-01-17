@@ -3,6 +3,7 @@ package com.mygdx.game;
 import android.os.AsyncTask;
 
 import com.badlogic.gdx.Gdx;
+import com.mygdx.game.util.GameManager;
 import com.mygdx.game.util.net.ConnectionManager;
 
 import java.io.DataInputStream;
@@ -22,9 +23,6 @@ public class AndroidConnectionManager extends AsyncTask<String, Void, Void>  imp
         String req = messages[0];
         String data = messages[1];
 
-        //
-
-
         try
         {
             socket = new Socket("192.168.1.11", 7800);
@@ -34,10 +32,13 @@ public class AndroidConnectionManager extends AsyncTask<String, Void, Void>  imp
             printWriter.flush();
             printWriter.close();
             socket.close();
+
         }
         catch (IOException ex)
         {
             ex.printStackTrace();
+            GameManager.connected = false;
+
         }
         return null;
     }

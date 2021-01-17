@@ -21,7 +21,7 @@ public class GameManager {
     public static Knight PLAYER;
     public static AssetManager assetManager;
     public static ConnectionManager connectionManager = null;
-    public static boolean connected = false;
+    public static boolean connected = true;
 
     private static Gson gson;
 
@@ -30,9 +30,9 @@ public class GameManager {
     public GameManager(GameClass game) {
         assetManager = game.getAssetManager();
         connectionManager = game.getConnectionManager();
-        if (connectionManager != null) {
+        if (connected) {
             connectionManager.sendMessage(reqCONNECTION, "192.168.1.15");
-            connected = true;
+            //connected = true;
             Thread serverConnection = new Thread(new MyServerThread());
             serverConnection.start();
         }
@@ -73,6 +73,8 @@ public class GameManager {
         if (!file.exists()) {
             createNewCharacter();
         } else {
+            if (connected)
+                connectionManager.sendMessage(reqLOAD, "");
 
             KnightJSON jsonKnight = gson.fromJson(file.readString(), KnightJSON.class);
             Gdx.app.log("READ FILE", file.readString());

@@ -19,7 +19,7 @@ public class GameClass extends Game {
 	GameManager gameManager;
 
 	public static AssetManager assetManager = new AssetManager();
-	private ConnectionManager connectionManager;
+	private ConnectionManager connectionManager = null;
 
 	public static enum Screens {
 		MAIN_MENU, GAME, UPGRADE;
