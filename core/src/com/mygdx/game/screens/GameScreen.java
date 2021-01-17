@@ -284,9 +284,10 @@ public class GameScreen extends ScreenAdapter {
             enemy.takeAction(player, enemyActionID);
 
             if (player.hp <= 0) {
-                openDialog("YOU DIED");
+                openDialog( player.name + " has Fallen");
                 playerDead = true;
                 Gdx.app.log("FIGHT ENDED", "you died");
+                GameManager.createNewCharacter();
                 animationID = enemyAnimationID = 0;
             }
 
