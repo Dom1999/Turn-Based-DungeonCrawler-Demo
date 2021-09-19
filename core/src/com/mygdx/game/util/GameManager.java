@@ -21,7 +21,7 @@ public class GameManager {
     public static Knight PLAYER;
     public static AssetManager assetManager;
     public static ConnectionManager connectionManager = null;
-    public static boolean connected = true;
+    public static boolean connected = false;
 
     private static Gson gson;
 

@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -9,9 +10,9 @@ import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.MainMenu;
 import com.mygdx.game.screens.UpgradeScreen;
-import com.mygdx.game.util.net.ConnectionManager;
 import com.mygdx.game.util.GameManager;
 import com.mygdx.game.util.assets.AssetDescriptors;
+import com.mygdx.game.util.net.ConnectionManager;
 
 public class GameClass extends Game {
 	SpriteBatch batch;

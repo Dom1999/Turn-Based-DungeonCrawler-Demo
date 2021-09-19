@@ -3,12 +3,7 @@
 package com.mygdx.game.util.net;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.mygdx.game.util.GameManager;
-
-import org.omg.CORBA.portable.InputStream;
-
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
